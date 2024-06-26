@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login or Register - Tarpaulin</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body{
+            background-color: azure;
+        }
+        .form-container {
+            display: none;
+        }
+        .small-alert {
+            font-size: 0.8rem;
+            padding: 0.5rem 1rem;
+            margin-bottom: 1rem;
+        }
+        .image-container {
+            position: relative;
+            width: 100%;
+            text-align: center;
+        }
+        .image-container img {
+            width: 100%;
+            height: auto;
+            border: 3px solid silver;
+            border-radius: 10px;
+        }
+        .overlay-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: Azure;
+            font-size: 55px;
+            font-weight:  bold;
+            padding: 10px;
+        }
+        .tool {
+            margin-bottom: 22px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="image-container">
+            <img src="{{ url_for('static', filename='images/tarp.png') }}?v=1.0" alt="Your Image" class="img-fluid" align="center" style="width: 600px; height: 80px;">
+            <h1 class="overlay-text">Tarpaulin</h1>
+        </div>
+        <div class="tool">
+            <h5 align="center">Course Management</h5>
+        </div>
+        <div class="button-group mb-3" align="center">
+            <button id="show-login" class="btn btn-primary">Login</button>
+            <button id="show-register" class="btn btn-secondary">Register</button>
+        </div>
+
+        <div id="login-form" class="form-container">
+            <h2>Login</h2>
+            <form action="{{ url_for('login_user') }}" method="post">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+         {% for message in get_flashed_messages() %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert" align="center" id="flash-messages-2">
+                           {{message}}
+                    </div>
+        {% endfor %}
+
+        <div id="register-form" class="form-container">
+            <h2>Register</h2>
+            <form action="{{ url_for('register_user') }}" method="post">
+                <div class="form-group">
+                    <label for="username">Username <small class="text-muted">(e-mail format)</small></label>
+                    <input type="text" class="form-control" id="reg-username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password <small class="text-muted">(8+ characters and must contain at least three of the following: lowercase letter, uppercase letter, number, special character)</small></label>
+                    <input type="password" class="form-control" id="reg-password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select class="form-control" id="role" name="role" required>
+                        <option value="admin">Admin</option>
+                        <option value="student">Instructor</option>
+                        <option value="instructor">Student</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary">Register</button>
+            </form>
+            {% for message in get_flashed_messages() %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert" align="center" id="flash-messages-1">
+                           {{message}}
+                    </div>
+        {% endfor %}
+            <div align="center">
+        <h4>About Roles</h4>
+            <p>Admin: Create and modify courses. Only admins can add an instructor to a course or change the instructor.</p>
+            <p>Instructor: View courses you have been assigned to by an admin. View enrollment in your courses and assign grades.</p>
+            <p>Student: Enroll in or drop courses and view your current courses and grades. Only students can modify enrollment.</p>
+        </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('show-login').addEventListener('click', function() {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('register-form').style.display = 'none';
+            hideFlashMessages();
+        });
+
+        document.getElementById('show-register').addEventListener('click', function() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+            hideFlashMessages();
+        });
+
+        function hideFlashMessages() {
+            const flashMessages1 = document.getElementById('flash-messages-1');
+            const flashMessages2 = document.getElementById('flash-messages-2');
+            flashMessages1.style.display = 'none';
+            flashMessages2.style.display = 'none';
+        }
+
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+</body>
+</html>

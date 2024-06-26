@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Courses - Tarpaulin</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body{
+            background-color: azure;
+        }
+        table {
+            background-color: white;
+        }
+
+    </style>
+    <script>
+        function enableEnrollButton(courseId) {
+            document.getElementById('enrollButton').disabled = false;
+            document.getElementById('enrollButton').setAttribute('data-course-id', courseId);
+        }
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Disable the enroll button and reset the radio buttons
+            document.getElementById('enrollButton').disabled = true;
+        });
+        function resetRadioButtons() {
+            // Reset the radio buttons
+            const radioButtons = document.querySelectorAll('input[name="course"]');
+            radioButtons.forEach(radio => radio.checked = false);
+        }
+
+        window.addEventListener('pageshow', resetRadioButtons);
+    </script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Available Courses</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Number</th>
+                    <th>Title</th>
+                    <th>Instructor</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                    <tr>
+                        <td>{{ course.subject }}</td>
+                        <td>{{ course.number }}</td>
+                        <td>{{ course.title }}</td>
+                        <td>{{ course.instructor_name }}</td>
+                        <td>
+                            <input type="radio" name="course" onclick="enableEnrollButton({{ course.id }})">
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-between">
+            <a href="{{ url_for('home') }}" class="btn btn-secondary mt-3">Back to Home</a>
+            <button id="enrollButton" class="btn btn-primary mt-3" disabled onclick="enrollInCourse()">Enroll</button>
+        </div>
+    </div>
+    <script>
+        function enrollInCourse() {
+            const courseId = document.getElementById('enrollButton').getAttribute('data-course-id');
+            window.location.href = `/enroll/${courseId}`;
+        }
+    </script>
+</body>
+</html>

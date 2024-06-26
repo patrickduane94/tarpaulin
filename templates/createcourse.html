@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Course - Tarpaulin</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: azure;
+            }
+        #flash-messages {
+            position: fixed;
+            top: 75%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            width: 100%;
+            max-width: 500px;
+        }
+    </style>
+    <script>
+        function validateForm() {
+            let subject = document.getElementById('subject');
+            let number = document.getElementById('number');
+            let title = document.getElementById('title');
+
+            if (!/^[a-zA-Z]{0,4}$/.test(subject.value)) {
+                subject.value = subject.value.slice(0, -1);
+            }
+
+            if (!/^\d{0,4}$/.test(number.value)) {
+                number.value = number.value.slice(0, -1);
+            }
+
+            if (title.value.length > 50) {
+                title.value = title.value.slice(0, -1);
+            }
+
+            enableSubmitButton();
+            return true;
+        }
+
+        function enableSubmitButton() {
+            const subject = document.getElementById('subject').value;
+            const number = document.getElementById('number').value;
+            const title = document.getElementById('title').value;
+            const instructorId = document.getElementById('instructor_id').value;
+
+            const isFormValid = /^[a-zA-Z]{2,4}$/.test(subject) &&
+                                /^\d{2,4}$/.test(number) &&
+                                title.length <= 50 && title.length >= 1 &&
+                                instructorId;
+
+            document.getElementById('submitButton').disabled = !isFormValid;
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.getElementById('subject').addEventListener('input', validateForm);
+            document.getElementById('number').addEventListener('input', validateForm);
+            document.getElementById('title').addEventListener('input', validateForm);
+            document.getElementById('instructor_id').addEventListener('change', enableSubmitButton);
+
+             const successMessage = document.getElementById('flash-messages');
+            if (successMessage) {
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 2500);
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Create Course</h1>
+        <form action="{{ url_for('create_course') }}" method="post" onsubmit="return validateForm()">
+            <div class="form-group">
+                <label for="subject">Subject <small class="text-muted">(2-4 characters)</small></label>
+                <input type="text" class="form-control" id="subject" name="subject" required maxlength="4">
+            </div>
+            <div class="form-group">
+                <label for="number">Number <small class="text-muted">(2-4 digits)</small></label>
+                <input type="text" class="form-control" id="number" name="number" required maxlength="4">
+            </div>
+            <div class="form-group">
+                <label for="title">Title <small class="text-muted">(Max 50 characters)</small></label>
+                <input type="text" class="form-control" id="title" name="title" required maxlength="50">
+            </div>
+            <div class="form-group">
+                <label for="instructor_id">Instructor</label>
+                <select class="form-control" id="instructor_id" name="instructor_id">
+                    {% for instructor in instructors %}
+                        <option value="{{ instructor.id }}">
+                            {{ instructor.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('home') }}" class="btn btn-secondary mt-3">Back to Home</a>
+                <button type="submit" id="submitButton" class="btn btn-primary mt-3" disabled>Submit</button>
+            </div>
+        </form>
+    </div>
+    <br>
+    <div class="d-flex justify-content-between">
+    {% for message in get_flashed_messages() %}
+                    <div id="flash-messages" class="alert alert-success alert-dismissible fade show" role="alert" align="center" style="width: 700px;">
+                           {{message}}
+                    </div>
+    {% endfor %}
+    </div>
+</body>
+</html>

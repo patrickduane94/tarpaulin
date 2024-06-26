@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Modify Courses - Tarpaulin</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: azure;
+        }
+        table {
+            background-color: white;
+        }
+    </style>
+    <script>
+        function enableModifyButton(courseId) {
+            document.getElementById('modifyButton').disabled = false;
+            document.getElementById('modifyButton').setAttribute('data-course-id', courseId);
+        }
+
+        function modifyCourse() {
+            const courseId = document.getElementById('modifyButton').getAttribute('data-course-id');
+            window.location.href = `/modifycourse/${courseId}`;
+        }
+        function resetRadioButtons() {
+            // Reset the radio buttons
+            const radioButtons = document.querySelectorAll('input[name="course"]');
+            radioButtons.forEach(radio => radio.checked = false);
+            document.getElementById('modifyButton').disabled = true;
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            resetRadioButtons();
+        });
+        window.addEventListener('pageshow', resetRadioButtons);
+    </script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Modify Courses</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Number</th>
+                    <th>Title</th>
+                    <th>Instructor ID</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                    <tr>
+                        <td>{{ course.subject }}</td>
+                        <td>{{ course.number }}</td>
+                        <td>{{ course.title }}</td>
+                        <td>{{ course.instructor_name }}</td>
+                        <td>
+                            <input type="radio" name="course" onclick="enableModifyButton({{ course.id }})">
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-between">
+            <a href="{{ url_for('home') }}" class="btn btn-secondary mt-3">Back to Home</a>
+            <button id="modifyButton" class="btn btn-primary mt-3" disabled onclick="modifyCourse()">Modify Selected Course</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Directory - Tarpaulin</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: azure;
+        }
+        table {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5" style="width: 800px;">
+        <h1>Directory</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Avatar</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>
+                            <img src="{{ user.avatar if user.avatar else 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg' }}"
+                                 alt="Avatar" class="img-thumbnail" style="width: 60px; height: 55px;">
+                        </td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.role }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-between">
+            <a href="{{ url_for('home') }}" class="btn btn-secondary mt-3">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

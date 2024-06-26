@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home - Tarpaulin</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body{
+            background-color: azure;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .user-info p {
+            margin: 0;
+            margin-right: 0.5rem;
+        }
+        .custom-select {
+            width: auto;
+            min-width: 100px;
+            padding: 0.2rem;
+        }
+         .text-center {
+            font-weight: bold;
+            position: relative;
+            display: inline-block;
+        }
+        .text-center::after {
+            content: '';
+            display: block;
+            width: 70%; /* Adjust the width as needed */
+            height: 5px; /* Height of the underline */
+            background: linear-gradient(to right, navy, lightblue);
+            position: absolute;
+            left: 15%; /* Centers the underline */
+            bottom: -10px; /* Adjust the distance between the text and the underline */
+        }
+         .header-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="d-flex justify-content-end">
+            <div class="user-info">
+                <p>{{ session.name }}</p>
+                <select name="view_profile" onchange="if (this.value) window.location.href=this.value;" style="width:20px">
+                    <option value=""></option>
+                    <option value="{{ url_for('profile') }}">Profile</option>
+                    <option value="{{ url_for('logout') }}">Logout</option>
+                </select>
+            </div>
+        </div>
+        <div class="header-container">
+        <h1 class="text-center">Dashboard</h1>
+        </div>
+        <br>
+        <div class="row justify-content-center">
+            {% if role == 'student' %}
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Current Courses</h5>
+                            <p class="card-text">View courses and grades or drop a course.</p>
+                            <a href="{{ url_for('get_user_courses') }}" class="btn btn-primary">Go</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Enroll</h5>
+                            <p class="card-text">Enroll in available courses.</p>
+                            <a href="{{ url_for('get_available_courses') }}" class="btn btn-primary">Go</a>
+                        </div>
+                    </div>
+                </div>
+            {% elif role == 'instructor' %}
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Current Courses</h5>
+                            <p class="card-text">View the courses you are teaching.</p>
+                            <a href="{{ url_for('get_user_courses') }}" class="btn btn-primary">Go</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Gradebook</h5>
+                            <p class="card-text">View course enrollment and assign grades.</p>
+                            <a href="{{ url_for('load_gradebook') }}" class="btn btn-primary">Go</a>
+                        </div>
+                    </div>
+                </div>
+            {% elif role == 'admin' %}
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Create Course</h5>
+                            <p class="card-text">Provide course details and select instructor.</p>
+                            <a href="{{ url_for('create_course_form') }}" class="btn btn-primary">Go</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Modify Course</h5>
+                            <p class="card-text">Make changes to existing courses.</p>
+                            <a href="/modifycourse" class="btn btn-primary">Go</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Directory</h5>
+                            <p class="card-text">View all Tarpaulin users.</p>
+                            <a href="{{ url_for('load_directory') }}" class="btn btn-primary">Go</a>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

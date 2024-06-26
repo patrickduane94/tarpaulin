@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Grades - Tarpaulin</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: azure;
+        }
+        table {
+            background-color: white;
+        }
+        #flash-messages {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            width: 100%;
+            max-width: 500px;
+        }
+    </style>
+    <script>
+        let currentCourseId = null;
+        let originalGrades = {};
+
+        function loadStudents(courseId) {
+            currentCourseId = courseId;
+            fetch(`/courses/${courseId}/students`)
+                .then(response => response.json())
+                .then(data => {
+                    const students = data;
+                    const tbody = document.getElementById('studentsTableBody');
+                    tbody.innerHTML = '';
+
+                    students.forEach(student => {
+                        originalGrades[student.id] = student.grade;
+                        const row = document.createElement('tr');
+
+                         let avatarHtml = '';
+                        if (student.avatar_url) {
+                            avatarHtml = `<td><img src="${student.avatar_url}" alt="Avatar" class="img-thumbnail" style="width: 50px; height: 50px;"></td>`;
+                        } else {
+                            avatarHtml = `<td><img src="https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg" alt="Avatar" class="img-thumbnail" style="width: 50px; height: 50px;"></td>`; // Provide a default image if no avatar exists
+                        }
+
+                        row.innerHTML = `
+                            ${avatarHtml}
+                            <td>${student.name}</td>
+                            <td>
+                                <input type="text" class="form-control grade-input" data-student-id="${student.id}" value="${student.grade}" oninput="enableSubmitButton(); validateGrade(this)" style="width: 200px;">
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    document.getElementById('submitGradesButton').disabled = true;
+                });
+        }
+
+        function enableSubmitButton() {
+            const inputs = document.querySelectorAll('.grade-input');
+            let changesMade = false;
+            inputs.forEach(input => {
+                if (input.value !== originalGrades[input.dataset.studentId]) {
+                    changesMade = true;
+                }
+            });
+            document.getElementById('submitGradesButton').disabled = !changesMade;
+        }
+
+        function submitGrades() {
+            const inputs = document.querySelectorAll('.grade-input');
+            const grades = {};
+            inputs.forEach(input => {
+                grades[input.dataset.studentId] = input.value;
+            });
+
+            fetch(`/courses/${currentCourseId}/grades`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    grades: grades
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadStudents(currentCourseId);
+                window.location.reload();
+            });
+        }
+        function hideFlashMessages() {
+            const flashMessages = document.getElementById('flash-messages');
+            setTimeout(() => {
+                 flashMessages.style.display = 'none';
+            }, 2500);
+        }
+        function validateGrade(input) {
+            const validGrades = /^(A|B|C|D|F)?(\+|-)?$/;
+            if (!validGrades.test(input.value)) {
+                input.value = input.value.slice(0, -1); // Remove the last character if it's invalid
+            }
+            if (input.value.length > 2) {
+                input.value = input.value.slice(0, 2); // Limit input to 2 characters
+            }
+        }
+         window.onload = function() {
+            hideFlashMessages();
+        };
+    </script>
+</head>
+<body>
+    <div class="container mt-5" style="width: 900px;">
+        <h1>Manage Grades</h1>
+        <div class="form-group">
+            <label for="courseSelect">Select Course</label>
+            <select class="form-control" id="courseSelect" onchange="loadStudents(this.value)" style="width: 300px;">
+                <option value="">--Select a Course--</option>
+                {% for course in courses %}
+                    <option value="{{ course.id }}">{{ course.title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Avatar</th>
+                    <th>Name</th>
+                    <th>Grade <small class="text-muted">(Capital letter and +- only)</small></th>
+                </tr>
+            </thead>
+            <tbody id="studentsTableBody">
+                <!-- Students will be loaded here -->
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-between">
+            <a href="{{ url_for('home') }}" class="btn btn-secondary mt-3">Back to Home</a>
+            <button id="submitGradesButton" class="btn btn-primary mt-3" onclick="submitGrades()" disabled>Submit Grades</button>
+        </div>
+    </div>
+    <br>
+    <div class="d-flex justify-content-between">
+    {% for message in get_flashed_messages() %}
+                    <div id="flash-messages" class="alert alert-success alert-dismissible fade show" role="alert" align="center" style="width: 700px;">
+                           {{message}}
+                    </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
