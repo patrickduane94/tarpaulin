@@ -26,7 +26,7 @@ pip install -r requirements.txt
 ### Step 3: Configure Environment Variables
 In the `main.py` file, replace the following variables with your specific configuration:
 
-- `PHOTO_BUCKET`: The name of your AWS S3 bucket where photos are stored.
+- `PHOTO_BUCKET`: The name of your Google Cloud Storage bucket where photos are stored.
 - `CLIENT_ID`: Your Auth0 Client ID.
 - `CLIENT_SECRET`: Your Auth0 Client Secret.
 - `DOMAIN`: Your Auth0 domain.
