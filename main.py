@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file, jsonify, render_template, redirect, url_for, session, flash
+from flask import Flask, request, send_file, jsonify, render_template, redirect, url_for, session, flash, make_response
 from google.cloud import storage, datastore
 import io
 import requests
@@ -14,7 +14,7 @@ from authlib.integrations.flask_client import OAuth
 PHOTO_BUCKET = ''
 
 app = Flask(__name__)
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 60 * 60 * 24 * 7
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 app.secret_key = 'SECRET_KEY'
 
@@ -24,6 +24,7 @@ client = datastore.Client()
 CLIENT_ID = ''
 CLIENT_SECRET = ''
 DOMAIN = ''
+
 
 ALGORITHMS = ["RS256"]
 
@@ -150,7 +151,10 @@ def verify_jwt(request):
 
 @app.after_request
 def add_header(response):
-    response.cache_control.max_age = 86400  # Cache static files for one day
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0, post-check=0, pre-check=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    response.headers['Cache-Control'] = 'public, max-age=0'
     return response
 
 
@@ -858,6 +862,7 @@ def create_auth0_user(username, password, role):
 
 
 @app.route('/createcourse')
+@requires_auth
 def create_course_form():
     if session.get('role') == 'admin':
         instructors = get_all_instructors()
@@ -867,6 +872,7 @@ def create_course_form():
 
 
 @app.route('/createcourse', methods=['POST'])
+@requires_auth
 def create_course():
     response, status_code = post_course()
     if status_code == 201:
@@ -878,6 +884,7 @@ def create_course():
 
 
 @app.route('/createcourse', methods=['GET'])
+@requires_auth
 def create_course_view():
     instructors = get_all_instructors()
     return render_template('createcourse.html', instructors=instructors)
@@ -940,6 +947,7 @@ def load_gradebook():
 
 
 @app.route('/directory')
+@requires_auth
 def load_directory():
     user_list = []
     query = client.query(kind='users')
